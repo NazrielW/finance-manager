@@ -76,7 +76,12 @@ class TransactionController extends Controller
             'date' => 'required|date',
         ]);
 
-        $transaction->update($request->all());
+        $transaction->update([
+            'type' => $request->type,
+            'amount' => $request->amount,
+            'description' => $request->description,
+            'date' => $request->date,
+        ]);
 
         return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil diperbarui!');
     }
@@ -87,6 +92,6 @@ class TransactionController extends Controller
     public function destroy(Transaction $transaction)
     {
         $transaction->delete();
-        return redirect()->route('transaction.index')->with('success', 'Transaksi berhasil dihapus!');
+        return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil dihapus!');
     }
 }
