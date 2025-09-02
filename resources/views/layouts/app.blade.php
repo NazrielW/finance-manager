@@ -8,26 +8,36 @@
 
     @vite(['resources/css/app.css','resources/js/app.js'])
 </head>
-<body class="bg-gray-100">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm" style="background-color: #FF6600;">
         <div class="container">
-            <a class="navbar-brand font-bold" href="{{ url('/dashboard') }}">Finance Manager</a>
-            <div>
-                <a class="nav-link text-white" href="{{ route('transactions.index') }}">Transaksi</a>
-                @if(session('user'))
-                    <span class="text-white me-3">Hi, {{ session('user')->name }}</span>
-                    <a class="btn btn-sm btn-light" href="{{ route('logout') }}">Logout</a>
-                @else
-                    <a class="btn btn-sm btn-light" href="{{ route('login') }}">Login</a>
-                    <a class="btn btn-sm btn-warning" href="{{ route('register') }}">Register</a>
-                @endif
+            <a href="{{ route('dashboard') }}" class="navbar-brand fw-bold">Finance Manager</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a href="{{ route('transactions.index') }}" class="nav-link">Transaksi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('logout') }}" class="nav-link text-danger">Logout</a>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
 
-    <main class="container py-4">
-        @include('partials.flash')
+    <!--Main Content-->
+    <div class="container py-4">
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ implode(',', $errors->all()) }}
+            </div>
+        @endif
+
         @yield('content')
-    </main>
+    </div>
 </body>
 </html>

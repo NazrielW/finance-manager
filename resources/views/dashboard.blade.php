@@ -1,11 +1,13 @@
 @extends('layouts.app')
 
-@section('title','Dashboard')
+@section('title', 'Dashboard')
 
 @section('content')
-<div class="text-center py-5">
-    <h2 class="fw-bold text-2xl mb-3">Welcome to Finance Manager</h2>
-    <p class="text-muted">Kelola pemasukan dan pengeluaranmu dengan mudah 🚀</p>
-    <a href="{{ route('transactions.index') }}" class="btn btn-primary mt-3">Lihat Transaksi</a>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h2 class="fw-bold">Selamat datang di Finance Manager</h2>
+        <p class="text-muted mb-3">Kelola pemasukan dan pengeluaranmu dengan mudah.</p>
+        <a href="{{ route('transactions.index') }}" class="btn btn-primary">Lihat Transaksi</a>
+    </div>
 </div>
 @endsection
