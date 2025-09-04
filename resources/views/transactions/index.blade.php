@@ -8,7 +8,7 @@
         <h2 class="fw-bold">Daftar Transaksi</h2>
     </div>
     <div class="align-items-end mb-3">
-        <a href="{{ route('dashboard') }}" class="btn btn-danger ml-3">Kembali</a>
+        <a href="{{ route('dashboard') }}" class="btn btn-danger">Kembali</a>
         <a href="{{ route('transactions.create') }}" class="btn btn-success">+ Tambah</a>
     </div>
 </div>

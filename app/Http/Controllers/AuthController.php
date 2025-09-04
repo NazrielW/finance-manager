@@ -16,24 +16,21 @@ class AuthController extends Controller
 
 public function register(Request $request)
 {
-    // ✅ Validasi data
+
     $request->validate([
         'name' => 'required|string|max:255',
         'email' => 'required|string|email|max:255|unique:users',
         'password' => 'required|string|min:6'
     ]);
 
-    // ✅ Simpan user baru
-    $user = new User();
+    $user = User::create();
     $user->name = $request->name;
     $user->email = $request->email;
     $user->password = Hash::make($request->password);
     $user->save();
 
-    // ✅ Simpan session login
-    $request->session()->put('user', $user);
+    Auth::login($user);
 
-    // ✅ Redirect ke dashboard
     return redirect('/dashboard')->with('success', 'Registrasi berhasil!');
 }
 
@@ -43,9 +40,9 @@ public function register(Request $request)
     }
 
     public function login(Request $request) {
-        $request->validate([
-            'email' => 'required',
-            'password' => 'required',
+        $credentials = $request->validate([
+            'email' => ['required'],
+            'password' => ['required'],
         ]);
 
         $user = User::where('email', $request->email)->first();
@@ -61,7 +58,10 @@ public function register(Request $request)
     }
 
     public function logout(Request $request) {
+        Auth::logout();
         $request->session()->forget('user');
-        return redirect('/welcome');
+        $request->session()->flush();
+
+        return redirect('/welcome')->with('success', 'Kamu telah logout!');
     }
 }
