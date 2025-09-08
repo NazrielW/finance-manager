@@ -3,3 +3,113 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.footer-custom{
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #FF6600;
+    color: black;
+    text-align: center;
+    padding: 10px 0;
+}
+
+.parallax-sect {
+    position: relative;
+    height: 100vh;
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.704), rgb(255, 255, 255)), url('https://prod.cdn.business.wfu.edu/uploads/2020/09/Image-Pulls-For-Web-Launch_Masters-in-Accounting-Versus-an-MBA-in-Finance.webp');
+    background-size: cover;
+    background-position: center;
+    background-attachment: scroll;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    cursor: default;
+}
+
+.btn-custom {
+    background-color: #ff6600;
+    padding: 0.5em;
+    color: black;
+    border-radius: 5px;
+    border: black;
+    text-decoration: none;
+}
+
+.btn-custom.group {
+    background-color: #ff6600;
+    border-radius: 0;
+    display: inline-block;
+    padding: 10px 15px;  
+    color: black;
+    position: relative;
+    overflow: hidden;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-custom.group::after {
+    content: '';
+    position: absolute;
+    bottom: 0;    
+    left: 0;
+    width: 0;          
+    height: 2px;
+    background: black;    
+    transition: width 0.3s ease;
+}
+
+.btn-custom:hover {
+    color: black;
+    border: black;
+    transform: scale(1.05);
+    transition: transform 0.2s;
+}
+
+.btn-custom.group:hover::after {
+    width: 100%;          /* garis muncul penuh pas hover */
+}
+
+.btn-custom-secondary {
+    background-color: white;
+    padding: 0.5em;
+    color: black;
+    border-radius: 5px;
+    border: black;
+    text-decoration: none;
+}
+
+.btn-custom-secondary:hover {
+    background-color: #bd4d03;
+    color: black;
+    border: black;
+    transform: scale(1.05);
+    transition: transform 0.2s;
+}
+
+.dropdown-hitem{
+    background-color: white;
+    color: black;
+    padding: 0.5em 1em;
+    text-decoration: none;
+    display: block;
+    border: none;
+    width: 100%;
+    text-align: left;
+}
+
+.dropdown-hitem:hover {
+    background-color: #ff6600;
+    color: white;
+    transform: scale(1.05);
+    transition: transform 0.2s;
+}
+
+.dropdown-hitem:active {
+    background-color: #ff6600;
+    color: white;
+}
+

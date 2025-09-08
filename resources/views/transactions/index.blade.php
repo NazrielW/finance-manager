@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@include('partials.modal')
+
 @section('title', 'Daftar Transaksi')
 
 @section('content')
@@ -43,7 +45,7 @@
                         <form action="{{ route('transactions.destroy', $t->id) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
-                            <button onclick="return confirm('Yakin hapus?')" class="btn btn-sm btn-danger">Hapus</button>
+                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmModal" >Hapus</button>
                         </form>
                     </td>
                 </tr>
@@ -57,3 +59,5 @@
     </div>
 </div>
 @endsection
+
+@include('partials.footer')
