@@ -1,7 +1,5 @@
 @extends('layouts.app')
 
-@include('partials.modal')
-
 @section('title', 'Daftar Transaksi')
 
 @section('content')

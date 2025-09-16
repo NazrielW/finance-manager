@@ -28,12 +28,12 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
-Route::get('/dashboard', fn() => view('dashboard'))
-    ->middleware('authcheck')
-    ->name('dashboard');
+Route::post('/logout',  [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/login', [AuthController::class, 'showLogin'])
     ->middleware('guestcheck')
     ->name('login');
+                                                                                                      
+Route::get('/register', [AuthController::class, 'showRegisterForm'])
+    ->middleware('guestcheck')
+    ->name('register');

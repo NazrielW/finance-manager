@@ -8,7 +8,7 @@
 
     @vite(['resources/css/app.css','resources/js/app.js'])
 </head>
-<body class="bg-light">
+<body class="bg-white">
     @include('partials.navbar')
 
     <!--Main Content-->
