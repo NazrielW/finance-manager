@@ -1,32 +1,39 @@
-<nav class="navbar navbar-expand-lg navbar-dark shadow-sm" style="background-color: #ff6600;">
-    <div class="container">
-        <a href="{{ route('dashboard') }}" class="navbar-brand fw-bold">Finance Manager</a>
-
-        @if (!session()->has('user'))
-        <div class="btn-group" role="group">
-            <a href="{{ route('login') }}" class="btn-custom group">Login</a>
-            <a href="{{ route('register') }}" class="btn-custom group">Register</a>
-            <a href="#about" class="btn-custom group">About</a>
-            <a href="#contact" class="btn-custom group">Contact</a>
+<nav class="navbar bg-body-tertiary fixed-top">
+    <div class="container-fluid">
+        <a href="{{ route('dashboard') }}" class="navbar-brand">Finance Manager</a>
+        @if (Auth::check())
+        <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="offcanvas offcanvas-end bg-white" tabindex="1" id="offcanvasNavbar">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Finance Manager</h5>
+                    
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="off-canvas-body">
+                <ul class="navbar-nav justify-content-end flex-grow-1 p-3">
+                    <li class="nav-item">
+                        <a href="{{ route('transactions.index') }}" class="nav-link active" aria-current="page">Transaction</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{  route('dashboard') }}" class="nav-link active">Home</a>
+                    </li>
+                    <li class="nav-item-dropdown">
+                        <a href="" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            More
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a href="#about" class="dropdown-item">About</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a href="" class="dropdown-item">My asnwer is you</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            @endif
         </div>
-        @endif
-
-        @if (session()->has('user')) 
-        <div class="dropdown">
-            <button class="btn-custom dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Menu
-            </button>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-hitem" href="{{ route('transactions.index') }}">Transaction</a></li>
-                <li>
-                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                        @csrf
-                        <button type="submit" class="dropdown-hitem text-danger">
-                            Logout
-                        </button>
-                    </form>
-                </li>
-            </ul>
-        @endif
     </div>
 </nav>
