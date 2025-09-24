@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 
@@ -13,7 +14,17 @@ class TransactionController extends Controller
     public function index(Request $request)
     {
         $user = $request->session()->get('user');
-        $transactions = Transaction::where('user_id', $user->id)->latest()->get();
+        $transactions = Transaction::where('user_id', $user->id)
+        ->orderBy('date', 'desc')
+        ->get()
+        ->groupBy(function($item){
+            return $item->date->format('Y-m-d');
+        })
+
+        ->map(function($itemByDate){
+            return $itemByDate->groupBy('source');
+        });
+
         return view('transactions.index', compact('transactions'));
     }
 
@@ -22,7 +33,8 @@ class TransactionController extends Controller
      */
     public function create()
     {
-        return view('transactions.create');
+        $categories = Category::all();
+        return view('transactions.create', ['categories' => $categories,]);
     }
 
     /**
@@ -43,7 +55,9 @@ class TransactionController extends Controller
             'type' => $request->type,
             'amount' => $request->amount,
             'description' => $request->description,
+            'source' => $request->source,
             'date' => $request->date,
+            'category_id' => $request->category_id,
         ]);
 
         return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil ditambahkan!');
@@ -62,7 +76,9 @@ class TransactionController extends Controller
      */
     public function edit(Transaction $transaction)
     {
-        return view('transactions.edit', compact('transaction'));
+        $transaction = Transaction::findOrFail($transaction->id);
+        $categories = Category::all();
+        return view('transactions.edit', compact('transaction', 'categories'));
     }
 
     /**
@@ -80,7 +96,9 @@ class TransactionController extends Controller
             'type' => $request->type,
             'amount' => $request->amount,
             'description' => $request->description,
+            'source' => $request->source,
             'date' => $request->date,
+            'category_id' => $request->category_id,
         ]);
 
         return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil diperbarui!');

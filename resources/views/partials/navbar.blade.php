@@ -1,7 +1,7 @@
-<nav class="navbar bg-body-tertiary fixed-top">
+<nav class="navbar bg-body-tertiary sticky-top navbar-custom">
     <div class="container-fluid">
         <a href="{{ route('dashboard') }}" class="navbar-brand">Finance Manager</a>
-        @if (Auth::check())
+        @if (session()->has('user'))
         <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -28,7 +28,12 @@
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a href="" class="dropdown-item">My asnwer is you</a></li>
+                            <li class="dropdown-item">
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button class="text-danger" type="submit">Logout</button>
+                                </form>
+                            </li>
                         </ul>
                     </li>
                 </ul>
