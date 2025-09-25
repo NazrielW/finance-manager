@@ -14,18 +14,44 @@ class TransactionController extends Controller
     public function index(Request $request)
     {
         $user = $request->session()->get('user');
-        $transactions = Transaction::where('user_id', $user->id)
-        ->orderBy('date', 'desc')
-        ->get()
-        ->groupBy(function($item){
-            return $item->date->format('Y-m-d');
-        })
 
-        ->map(function($itemByDate){
-            return $itemByDate->groupBy('source');
-        });
+        // Mulai query dulu (supaya filter bisa dipakai)
+        $query = Transaction::where('user_id', $user->id);
 
-        return view('transactions.index', compact('transactions'));
+        // Filter tanggal
+        if ($request->filled('start_date')) {
+            $query->whereDate('date', '>=', $request->start_date);
+        }
+        if ($request->filled('end_date')) {
+            $query->whereDate('date', '<=', $request->end_date);
+        }
+
+        // Filter kategori
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        // Search sumber/keterangan
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('source', 'like', "%{$request->search}%")
+                  ->orWhere('description', 'like', "%{$request->search}%");
+            });
+        }
+
+        // Ambil data, urutkan, lalu groupBy
+        $transactions = $query->orderBy('date', 'desc')
+            ->get()
+            ->groupBy(function ($item) {
+                return $item->date->format('Y-m-d');
+            })
+            ->map(function ($itemByDate) {
+                return $itemByDate->groupBy('source');
+            });
+
+        $categories = Category::all();
+
+        return view('transactions.index', compact('transactions', 'categories'));
     }
 
     /**
@@ -34,7 +60,7 @@ class TransactionController extends Controller
     public function create()
     {
         $categories = Category::all();
-        return view('transactions.create', ['categories' => $categories,]);
+        return view('transactions.create', compact('categories'));
     }
 
     /**
@@ -61,14 +87,6 @@ class TransactionController extends Controller
         ]);
 
         return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil ditambahkan!');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Transaction $transaction)
-    {
-        //  
     }
 
     /**

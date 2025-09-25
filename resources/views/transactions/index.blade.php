@@ -11,6 +11,32 @@
     </div>
 </div>
 
+<form action="{{ route('transactions.index') }}" method="GET" class="row g-2 mb-3">
+    <div class="col-md-3">
+        <input type="date" name="start_date" value="{{ request('start_date') }}" class="form-control">
+    </div>
+    <div class="col-md-3">
+        <input type="date" name="end_date" value="{{ request('end_date') }}" class="form-control">
+    </div>
+    <div class="col-md-3">
+        <select name="category_id" class="form-select">
+            <option value="">Semua Kategori</option>
+            @foreach ($categories as $c)
+            <option value="{{ $c->id }}" {{ request('category_id') == $c->id ? 'selected' : '' }}>
+                {{ $c->name }}
+            </option>
+            @endforeach
+        </select>
+    </div>
+    <div class="col-md-3">
+        <input type="text" name="search" placeholder="Cari keterangan..." value="{{ request('search') }}" class="form-control">
+    </div>
+    <div class="col-md-12 text-end mt-2">
+        <button type="submit" class="btn btn-primary">Filter</button>
+        <a href="{{ route('transactions.index') }}" class="btn btn-secondary">Reset</a>
+    </div>
+</form>
+
 <div class="card shadow-sm">
     <div class="card-body">
         <table class="table table-bordered table-striped">
