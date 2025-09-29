@@ -11,6 +11,36 @@
     </div>
 </div>
 
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Total Pemasukan (Bulan Ini)</h5>
+                <p class="fs-4 fw-bold">Rp {{ number_format($income, 0, ',', '.') }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-bg-danger">
+            <div class="card-body">
+                <h5 class="card-title">Total Pengeluaran (Bulan Ini)</h5>
+                <p class="fs-4 fw-bold">Rp {{ number_format($expense, 0, ',', '.') }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Saldo</h5>
+                <p class="fs-4 fw-bold">Rp {{ number_format($balance, 0, ',', '.') }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Filter --}}
 <form action="{{ route('transactions.index') }}" method="GET" class="row g-2 mb-3">
     <div class="col-md-3">
         <input type="date" name="start_date" value="{{ request('start_date') }}" class="form-control">
@@ -37,6 +67,7 @@
     </div>
 </form>
 
+{{-- Tabel --}}
 <div class="card shadow-sm">
     <div class="card-body">
         <table class="table table-bordered table-striped">
@@ -56,7 +87,6 @@
                 @php $no = 1; @endphp
                 @forelse($transactions as $date => $sources)
                     @php
-                        // Hitung jumlah transaksi dalam 1 tanggal
                         $rowCount = collect($sources)->flatten(1)->count();
                         $rowIndex = 0;
                     @endphp
@@ -66,7 +96,7 @@
                         <tr>
                             <td>{{ $no++ }}</td>
 
-                            {{-- tampilkan tanggal hanya sekali dengan rowspan --}}
+                            {{-- tampilkan tanggal sekali saja --}}
                             @if($rowIndex == 0)
                                 <td rowspan="{{ $rowCount }}" class="align-middle">
                                     {{ \Carbon\Carbon::parse($date)->format('d M Y') }}
@@ -76,8 +106,8 @@
                             <td>{{ $source ?? 'Tidak ada' }}</td>
                             <td>{{ $t->category?->name ?? 'Tidak ada kategori' }}</td>
                             <td>
-                                <span class="badge bg-{{ $t->type == 'pemasukan' ? 'success' : 'danger' }}">
-                                    {{ ucfirst($t->type) }}
+                                <span class="badge bg-{{ $t->type == 'income' ? 'success' : 'danger' }}">
+                                    {{ $t->type == 'income' ? 'Pemasukan' : 'Pengeluaran' }}
                                 </span>
                             </td>
                             <td>Rp {{ number_format($t->amount, 0, ',', '.') }}</td>
@@ -87,7 +117,7 @@
                                 <form action="{{ route('transactions.destroy', $t->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-danger btn-sm">Hapus</button>
+                                    <button class="btn btn-danger btn-sm" onclick="return confirm('Hapus transaksi ini?')">Hapus</button>
                                 </form>
                             </td>
                         </tr>
@@ -96,7 +126,7 @@
                     @endforeach
                 @empty
                     <tr>
-                        <td colspan="7" class="text-center">Belum ada transaksi.</td>
+                        <td colspan="8" class="text-center">Belum ada transaksi.</td>
                     </tr>
                 @endforelse
             </tbody>

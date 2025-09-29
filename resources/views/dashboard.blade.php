@@ -11,6 +11,7 @@
         <a href="{{ route('transactions.index') }}" class="btn btn-primary">Lihat Transaksi</a>
     </div>
 </div>
+
     
 @include('partials.footer')
 

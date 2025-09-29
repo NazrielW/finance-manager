@@ -11,55 +11,53 @@ class TransactionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
-        $user = $request->session()->get('user');
+public function index(Request $request)
+{
+    $user = $request->session()->get('user');
 
-        // Mulai query dulu (supaya filter bisa dipakai)
-        $query = Transaction::where('user_id', $user->id);
-
-        // Filter tanggal
-        if ($request->filled('start_date')) {
-            $query->whereDate('date', '>=', $request->start_date);
-        }
-        if ($request->filled('end_date')) {
-            $query->whereDate('date', '<=', $request->end_date);
-        }
-
-        // Filter kategori
-        if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
-        }
-
-        // Search sumber/keterangan
-        if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('source', 'like', "%{$request->search}%")
-                  ->orWhere('description', 'like', "%{$request->search}%");
+    $query = Transaction::where('user_id', $user->id)
+        ->when($request->filled('start_date'), fn($q) => $q->whereDate('date', '>=', $request->start_date))
+        ->when($request->filled('end_date'), fn($q) => $q->whereDate('date', '<=', $request->end_date))
+        ->when($request->filled('category_id'), fn($q) => $q->where('category_id', $request->category_id))
+        ->when($request->filled('search'), function($q) use ($request) {
+            $q->where(function ($q2) use ($request) {
+                $q2->where('source', 'like', "%{$request->search}%")
+                   ->orWhere('description', 'like', "%{$request->search}%");
             });
-        }
+        });
 
-        // Ambil data, urutkan, lalu groupBy
-        $transactions = $query->orderBy('date', 'desc')
-            ->get()
-            ->groupBy(function ($item) {
-                return $item->date->format('Y-m-d');
-            })
-            ->map(function ($itemByDate) {
-                return $itemByDate->groupBy('source');
-            });
+    // Group transaksi
+    $transactions = $query->orderBy('date', 'desc')
+        ->get()
+        ->groupBy(fn($item) => $item->date->format('Y-m-d'))
+        ->map(fn($itemByDate) => $itemByDate->groupBy('source'));
 
-        $categories = Category::all();
+    // Hitung pemasukan & pengeluaran langsung dari DB
+    $income = $query->clone()->where('type', 'income')->sum('amount');
+    $expense = $query->clone()->where('type', 'expense')->sum('amount');
 
-        return view('transactions.index', compact('transactions', 'categories'));
-    }
+    // Ambil balance user
+    // Jika balance kolom di tabel users
+    // $balance = $user->balance ?? 0;
+
+    // Jika balance relasi ke tabel balances
+    $balance = $user->balance->amount ?? 0;
+
+    $categories = Category::all();
+
+    return view('transactions.index', compact('transactions', 'categories', 'income', 'expense', 'balance'));
+}
+
+
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        $categories = Category::all();
+        $user = $request->session()->get('user');
+        $categories = Category::where('user_id', $user->id)->get();
+
         return view('transactions.create', compact('categories'));
     }
 
@@ -68,34 +66,38 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'type' => 'required|in:pemasukan,pengeluaran',
-            'amount' => 'required|numeric',
-            'date' => 'required|date',
-        ]);
-
         $user = $request->session()->get('user');
 
-        Transaction::create([
-            'user_id' => $user->id,
-            'type' => $request->type,
-            'amount' => $request->amount,
-            'description' => $request->description,
-            'source' => $request->source,
-            'date' => $request->date,
-            'category_id' => $request->category_id,
+        $validated = $request->validate([
+            'title'       => 'required|string|max:255',
+            'amount'      => 'required|numeric|min:0',
+            'type'        => 'required|in:income,expense',
+            'date'        => 'required|date',
+            'category_id' => 'nullable|exists:categories,id',
+            'source'      => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:500',
         ]);
 
-        return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil ditambahkan!');
+        $validated['user_id'] = $user->id;
+
+        Transaction::create($validated);
+
+        return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil ditambahkan.');
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Transaction $transaction)
+    public function edit(Request $request, Transaction $transaction)
     {
-        $transaction = Transaction::findOrFail($transaction->id);
-        $categories = Category::all();
+        $user = $request->session()->get('user');
+
+        if ($transaction->user_id !== $user->id) {
+            abort(403);
+        }
+
+        $categories = Category::where('user_id', $user->id)->get();
+
         return view('transactions.edit', compact('transaction', 'categories'));
     }
 
@@ -104,30 +106,40 @@ class TransactionController extends Controller
      */
     public function update(Request $request, Transaction $transaction)
     {
-        $request->validate([
-            'type' => 'required|in:pemasukan,pengeluaran',
-            'amount' => 'required|numeric',
-            'date' => 'required|date',
+        $user = $request->session()->get('user');
+
+        if ($transaction->user_id !== $user->id) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'title'       => 'required|string|max:255',
+            'amount'      => 'required|numeric|min:0',
+            'type'        => 'required|in:income,expense',
+            'date'        => 'required|date',
+            'category_id' => 'nullable|exists:categories,id',
+            'source'      => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:500',
         ]);
 
-        $transaction->update([
-            'type' => $request->type,
-            'amount' => $request->amount,
-            'description' => $request->description,
-            'source' => $request->source,
-            'date' => $request->date,
-            'category_id' => $request->category_id,
-        ]);
+        $transaction->update($validated);
 
-        return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil diperbarui!');
+        return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil diperbarui.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Transaction $transaction)
+    public function destroy(Request $request, Transaction $transaction)
     {
+        $user = $request->session()->get('user');
+
+        if ($transaction->user_id !== $user->id) {
+            abort(403);
+        }
+
         $transaction->delete();
-        return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil dihapus!');
+
+        return redirect()->route('transactions.index')->with('success', 'Transaksi berhasil dihapus.');
     }
 }
