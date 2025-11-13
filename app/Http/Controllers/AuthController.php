@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Balance;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -27,6 +28,11 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+        ]);
+
+        Balance::create([
+            'user_id' => $user->id,
+            'amount' => 0
         ]);
 
         // Simpan user ke session (manual)

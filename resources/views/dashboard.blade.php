@@ -12,7 +12,19 @@
     </div>
 </div>
 
-    
+@include('widgets.todo')
+
+<div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-8 rounded-md shadow-md mb-4 max-w-md mt-4">
+    <h3 class="font-semibold text-lg mb-1">Catatan Kamu</h3>
+    <p class="text-sm whitespace-pre-line">
+        {{ $note->content ? $note->content : 'Belum ada catatan, tambahkan di halaman profil.' }}
+    </p>
+</div>
+
+@include('widgets.chart')
+
+@include('widgets.donut')
+
 @include('partials.footer')
 
 @endsection

@@ -47,6 +47,9 @@
                             @enderror
                         </div>
                         <button type="submit" class="btn btn-success w-100">Register</button>
+                        <div class="text-center mt-3">
+                            <a href="{{  route('welcome') }}" class="btn btn-outline-danger w-100">Kembali</a>
+                        </div>
                     </form>
                 </div>
             </div>

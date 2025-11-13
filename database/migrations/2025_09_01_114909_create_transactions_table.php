@@ -13,11 +13,36 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->enum('type', ['pemasukan', 'pengeluaran']);
-            $table->decimal('amount', 15 , 2);
+
+            // Relasi ke tabel users (user yang membuat transaksi)
+            $table->foreignId('user_id')
+                ->constrained('users')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+
+            // Relasi ke tabel categories (kategori transaksi)
+            $table->foreignId('category_id')
+                ->constrained('categories')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+
+            $table->string('title');
+
+            // Jenis transaksi: pemasukan / pengeluaran
+            $table->enum('type', ['income', 'expense']);
+
+            // Jumlah uang
+            $table->decimal('amount', 15, 2);
+
+            // Keterangan tambahan (boleh kosong)
             $table->string('description')->nullable();
+
+            // Sumber uang (misalnya: gaji, tabungan, hadiah, dll)
+            $table->string('source')->nullable();
+
+            // Tanggal transaksi
             $table->date('date');
+
             $table->timestamps();
         });
     }

@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Transaction;
+use App\Models\Balance;
+use App\Models\Category;
+
 
 class User extends Authenticatable
 {
@@ -46,12 +50,29 @@ class User extends Authenticatable
         ];
     }
 
-    public function transactions() 
+    public function transactions()
     {
         return $this->hasMany(Transaction::class);
     }
 
-    public function balance(): HasOne {
+    public function balance(): HasOne
+    {
         return $this->hasOne(Balance::class);
     }
+
+    public function balanceAmount()
+    {
+        return $this->balance?->amount;
+    }
+
+    public function categories()
+    {
+        return $this->hasMany(Category::class);
+    }
+
+    public function note()
+    {
+        return $this->hasOne(Note::class);
+    }
+
 }
